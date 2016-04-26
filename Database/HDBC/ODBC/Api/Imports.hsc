@@ -12,7 +12,7 @@ module Database.HDBC.ODBC.Api.Imports
   , c_sqlDisconnect
   , c_sqlFreeHandle
   , c_sqlFreeStmt
-  , c_sqlGetDiagRecW
+  , c_sqlGetDiagRec
   , c_sqlSetConnectAttr
   , c_sqlGetConnectAttr
   , sQL_ATTR_AUTOCOMMIT
@@ -95,15 +95,15 @@ c_sqlDisconnect hDbc = do
   hdbcTrace $ printf "SQLDisconnect(%s) returned %d" (show hDbc) result
   return result
 
-foreign import #{CALLCONV} safe "sql.h SQLGetDiagRecW"
-  imp_sqlGetDiagRecW :: SQLSMALLINT -> Ptr () -> SQLSMALLINT -> CWString
-                     -> Ptr SQLINTEGER -> CWString -> SQLSMALLINT
-                     -> Ptr SQLSMALLINT -> IO SQLRETURN
+foreign import #{CALLCONV} safe "sql.h SQLGetDiagRec"
+  imp_sqlGetDiagRec :: SQLSMALLINT -> Ptr () -> SQLSMALLINT -> CString
+                    -> Ptr SQLINTEGER -> CString -> SQLSMALLINT
+                    -> Ptr SQLSMALLINT -> IO SQLRETURN
 
-c_sqlGetDiagRecW :: SQLSMALLINT -> Ptr () -> SQLSMALLINT -> CWString -> Ptr SQLINTEGER
-                 -> CWString -> SQLSMALLINT -> Ptr SQLSMALLINT -> IO SQLRETURN
-c_sqlGetDiagRecW handleType handle recNumber sqlState nativeErrorPtr messageText bufferLength textLengthPtr = do
-  result <- imp_sqlGetDiagRecW handleType handle recNumber sqlState nativeErrorPtr messageText bufferLength textLengthPtr
+c_sqlGetDiagRec :: SQLSMALLINT -> Ptr () -> SQLSMALLINT -> CString -> Ptr SQLINTEGER
+                 -> CString -> SQLSMALLINT -> Ptr SQLSMALLINT -> IO SQLRETURN
+c_sqlGetDiagRec handleType handle recNumber sqlState nativeErrorPtr messageText bufferLength textLengthPtr = do
+  result <- imp_sqlGetDiagRec handleType handle recNumber sqlState nativeErrorPtr messageText bufferLength textLengthPtr
   hdbcTrace $ printf "SqlGetDiagRec(%d, %s, %d, %s, %s, %s, %d, %s) returned %d"
                 handleType (show handle) recNumber (show sqlState) (show nativeErrorPtr) (show messageText) bufferLength (show textLengthPtr) result
   return result

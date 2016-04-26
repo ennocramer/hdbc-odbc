@@ -44,13 +44,13 @@ getDiag ht hp irow =
   alloca $ \pnaterr ->
   allocaBytes 1025 $ \csmsg ->
   alloca $ \pmsglen -> do
-    ret <- c_sqlGetDiagRecW ht hp irow csstate pnaterr csmsg 1024 pmsglen
+    ret <- c_sqlGetDiagRec ht hp irow csstate pnaterr csmsg 1024 pmsglen
     if sqlSucceeded ret
      then do
-      state <- peekCWStringLen (csstate, 5)
+      state <- peekCStringLen (csstate, 5)
       nat <- peek pnaterr
       msglen <- peek pmsglen
-      msgstr <- peekCWStringLen (csmsg, fromIntegral msglen)
+      msgstr <- peekCStringLen (csmsg, fromIntegral msglen)
       next <- getDiag ht hp (irow + 1)
       return $ (state, show nat ++ ": " ++ msgstr) : next
     else
